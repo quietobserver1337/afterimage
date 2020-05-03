@@ -71,3 +71,16 @@ def scan(root, con=None):
     if close:
         con.close()
     return n
+
+
+def find_similar(con, max_dist=6):
+    rows = con.execute("SELECT id, dhash FROM images").fetchall()
+    pairs = []
+    for a in rows:
+        for b in rows:
+            if a[0] == b[0]:
+                continue
+            d = hashing.hamming(a[1], b[1])
+            if d <= max_dist:
+                pairs.append((a[0], b[0], d))
+    return pairs
