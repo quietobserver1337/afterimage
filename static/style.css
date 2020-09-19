@@ -1,0 +1,6 @@
+body { font-family: monospace; margin: 24px; background: #f4f4f2; color: #222; }
+h1 { font-weight: normal; letter-spacing: 3px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+figure { margin: 0; }
+figure img { width: 100%; display: block; border: 1px solid #ccc; }
+figcaption { font-size: 10px; color: #777; margin-top: 3px; }
