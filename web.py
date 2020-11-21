@@ -14,10 +14,11 @@ CON = None
 @app.route("/")
 def home():
     rows = CON.execute(
-        "SELECT id, name, width, height, bytes FROM images "
+        "SELECT id, name, width, height, bytes, ahash, dhash FROM images "
         "ORDER BY id DESC LIMIT 60").fetchall()
     total = CON.execute("SELECT COUNT(*) FROM images").fetchone()[0]
-    return render_template("index.html", rows=rows, total=total)
+    cur = rows[0] if rows else None
+    return render_template("index.html", rows=rows, total=total, cur=cur)
 
 
 @app.route("/thumb/<int:i>")

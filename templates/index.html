@@ -6,15 +6,36 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<h1>afterimage</h1>
-<p>{{ total }} images indexed</p>
-<div class="grid">
-{% for r in rows %}
-<figure>
-  <img src="/thumb/{{ r[0] }}">
-  <figcaption>{{ r[1] }}<br>{{ r[2] }}&times;{{ r[3] }}</figcaption>
-</figure>
-{% endfor %}
+<header>
+  <div class="brand">AFTERIMAGE</div>
+  <div class="hright">{{ total }} images</div>
+</header>
+<div class="wrap">
+  <main>
+    <div class="grid">
+      {% for r in rows %}
+      <figure>
+        <img src="/thumb/{{ r[0] }}">
+        <figcaption>{{ r[1] }}</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </main>
+  <aside>
+    <div class="card">
+      <h3>metadata</h3>
+      {% if cur %}
+      <div class="kv"><span>id</span><b>{{ cur[0] }}</b></div>
+      <div class="kv"><span>file</span><b>{{ cur[1] }}</b></div>
+      <div class="kv"><span>size</span><b>{{ cur[2] }}&times;{{ cur[3] }}</b></div>
+      <div class="kv"><span>bytes</span><b>{{ cur[4] }}</b></div>
+      <div class="kv"><span>ahash</span><b class="mono">{{ "%x"|format(cur[5]) }}</b></div>
+      <div class="kv"><span>dhash</span><b class="mono">{{ "%x"|format(cur[6]) }}</b></div>
+      {% else %}
+      <div class="dim">empty library</div>
+      {% endif %}
+    </div>
+  </aside>
 </div>
 </body>
 </html>
