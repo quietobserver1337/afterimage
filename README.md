@@ -12,3 +12,9 @@ there's a read-only web view now:
 `tools/make_samples.py` writes a synthetic corpus to `samples/` if you
 don't have a folder of images handy. index + thumbnails live under
 `<dir>/.afterimage/`.
+
+## ui
+
+the web view, roughly:
+
+![afterimage ui](docs/sample-profile.png)
