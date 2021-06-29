@@ -7,22 +7,50 @@
 </head>
 <body>
 <header>
-  <div class="brand">AFTERIMAGE</div>
-  <div class="hright">{{ total }} images</div>
+  <div class="brand">AFTERIMAGE<span class="sub">local visual index</span></div>
+  <div class="hright">v{{ version }}</div>
 </header>
 <div class="wrap">
+  <nav>
+    <a class="on" href="#">library</a>
+    <a href="#recent">recent frames</a>
+    <a href="#similar">similar</a>
+    <a href="#meta">metadata</a>
+    <a href="#observer">observer</a>
+    <a href="#session">session</a>
+  </nav>
   <main>
+    <div class="sech" id="recent">recent frames
+      <span class="dim">latest {{ rows|length }} of {{ stats.frames }}</span></div>
     <div class="grid">
       {% for r in rows %}
       <figure>
-        <img src="/thumb/{{ r[0] }}">
+        <img src="/thumb/{{ r[0] }}" loading="lazy">
         <figcaption>{{ r[1] }}</figcaption>
       </figure>
       {% endfor %}
     </div>
+    <div class="sech" id="similar">similar <span class="dim">dhash &le; 7</span></div>
+    <table class="pairs">
+      {% for a, b, d in similar %}
+      <tr><td class="dim">#{{ a }}</td><td class="dim">#{{ b }}</td>
+          <td>&Delta; {{ d }}</td></tr>
+      {% endfor %}
+    </table>
   </main>
   <aside>
-    <div class="card">
+    <div class="card" id="observer">
+      <h3>observer</h3>
+      <div class="obs">{{ observer }}</div>
+      <div class="dim small">session {{ uptime }}</div>
+    </div>
+    <div class="card" id="session">
+      <h3>index</h3>
+      <div class="kv"><span>frames</span><b>{{ stats.frames }}</b></div>
+      <div class="kv"><span>pairs</span><b>{{ pairs }}</b></div>
+      <div class="kv"><span>state</span><b>idle</b></div>
+    </div>
+    <div class="card" id="meta">
       <h3>metadata</h3>
       {% if cur %}
       <div class="kv"><span>id</span><b>{{ cur[0] }}</b></div>
@@ -32,10 +60,14 @@
       <div class="kv"><span>ahash</span><b class="mono">{{ "%x"|format(cur[5]) }}</b></div>
       <div class="kv"><span>dhash</span><b class="mono">{{ "%x"|format(cur[6]) }}</b></div>
       {% else %}
-      <div class="dim">empty library</div>
+      <div class="dim small">empty library</div>
       {% endif %}
     </div>
   </aside>
 </div>
+<footer>
+  <span>afterimage v{{ version }}</span>
+  <span>frame {{ stats.seen }}</span>
+</footer>
 </body>
 </html>
