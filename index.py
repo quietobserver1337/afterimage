@@ -89,14 +89,15 @@ def scan(root, con=None):
     return n
 
 
-def find_similar(con, max_dist=6):
-    rows = con.execute("SELECT id, dhash FROM images").fetchall()
+def find_similar(con, max_dist=6, limit=None):
+    rows = con.execute(
+        "SELECT id, dhash FROM images ORDER BY id").fetchall()
     pairs = []
-    for a in rows:
-        for b in rows:
-            if a[0] == b[0]:
-                continue
-            d = hashing.hamming(a[1], b[1])
+    for i in range(len(rows)):
+        for j in range(i + 1, len(rows)):
+            d = hashing.hamming(rows[i][1], rows[j][1])
             if d <= max_dist:
-                pairs.append((a[0], b[0], d))
+                pairs.append((rows[i][0], rows[j][0], d))
+                if limit and len(pairs) >= limit:
+                    return pairs
     return pairs
