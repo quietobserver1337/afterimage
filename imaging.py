@@ -1,5 +1,15 @@
-"""perceptual hashes."""
+"""image loading, perceptual hashes, thumbnails."""
+from pathlib import Path
+
 from PIL import Image
+
+EXTS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tif", ".tiff"}
+
+
+def iter_images(root):
+    for p in sorted(Path(root).rglob("*")):
+        if p.suffix.lower() in EXTS and ".afterimage" not in p.parts:
+            yield p
 
 
 def load(path):
@@ -31,3 +41,16 @@ def dhash(im, size=8):
 
 def hamming(a, b):
     return bin(a ^ b).count("1")
+
+
+def thumb(im, size=192):
+    t = im.copy()
+    t.thumbnail((size, size), Image.ANTIALIAS)
+    return t
+
+
+def palette(im, n=5):
+    q = im.resize((64, 64)).quantize(colors=n, method=Image.MEDIANCUT)
+    pal = q.getpalette()[: n * 3]
+    return ["#%02x%02x%02x" % tuple(pal[i:i + 3])
+            for i in range(0, len(pal), 3)]

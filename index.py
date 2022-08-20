@@ -1,11 +1,11 @@
 """sqlite index for a local image library."""
+import json
 import sqlite3
 import time
 from pathlib import Path
 
-import hashing
+import imaging
 
-EXTS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
 DB_DIR = ".afterimage"
 
 
@@ -32,6 +32,7 @@ def open_db(root):
         height INTEGER,
         ahash INTEGER,
         dhash INTEGER,
+        palette TEXT,
         indexed_at REAL)""")
     con.execute(
         "CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT)")
@@ -50,37 +51,31 @@ def meta_set(con, key, value):
                 (key, str(value)))
 
 
-def iter_images(root):
-    for p in sorted(Path(root).rglob("*")):
-        if p.suffix.lower() in EXTS and DB_DIR not in p.parts:
-            yield p
-
-
 def scan(root, con=None):
     close = con is None
     con = con or open_db(root)
     seen = int(meta_get(con, "frames_seen"))
     n = 0
-    for p in iter_images(root):
+    for p in imaging.iter_images(root):
         st = p.stat()
         row = con.execute("SELECT id, mtime FROM images WHERE path=?",
                           (str(p),)).fetchone()
         if row and row[1] == st.st_mtime:
             continue
         try:
-            im = hashing.load(p)
+            im = imaging.load(p)
         except Exception:
             continue
         cur = con.execute(
             """INSERT OR REPLACE INTO images
-            (path,name,mtime,bytes,width,height,ahash,dhash,indexed_at)
-            VALUES(?,?,?,?,?,?,?,?,?)""",
+            (path,name,mtime,bytes,width,height,ahash,dhash,palette,indexed_at)
+            VALUES(?,?,?,?,?,?,?,?,?,?)""",
             (str(p), p.name, st.st_mtime, st.st_size, im.width, im.height,
-             hashing.ahash(im), hashing.dhash(im), time.time()))
+             imaging.ahash(im), imaging.dhash(im),
+             json.dumps(imaging.palette(im)), time.time()))
         seen += 1
-        t = im.copy()
-        t.thumbnail((192, 192))
-        t.save(thumbs_dir(root) / ("%d.jpg" % cur.lastrowid), quality=82)
+        imaging.thumb(im).save(
+            thumbs_dir(root) / ("%d.jpg" % cur.lastrowid), quality=82)
         n += 1
     meta_set(con, "frames_seen", seen)
     con.commit()
@@ -95,9 +90,20 @@ def find_similar(con, max_dist=6, limit=None):
     pairs = []
     for i in range(len(rows)):
         for j in range(i + 1, len(rows)):
-            d = hashing.hamming(rows[i][1], rows[j][1])
+            d = imaging.hamming(rows[i][1], rows[j][1])
             if d <= max_dist:
                 pairs.append((rows[i][0], rows[j][0], d))
                 if limit and len(pairs) >= limit:
                     return pairs
     return pairs
+
+
+def stats(con, root):
+    frames = con.execute("SELECT COUNT(*) FROM images").fetchone()[0]
+    try:
+        db = db_path(root).stat().st_size / 1e6
+    except OSError:
+        db = 0.0
+    return {"frames": frames,
+            "seen": meta_get(con, "frames_seen"),
+            "db": "%.1f mb" % db}

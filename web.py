@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """afterimage web ui — read-only view over the local index."""
+import json
 import os
 import sys
 import time
 
 from flask import Flask, abort, render_template, send_file
 
+import imaging
 import index as store
 
 VERSION = "0.4.0"
@@ -33,16 +35,15 @@ def fmt_uptime():
 @app.route("/")
 def home():
     rows = CON.execute(
-        "SELECT id, name, width, height, bytes, ahash, dhash, indexed_at "
+        "SELECT id, name, width, height, bytes, ahash, dhash, palette, "
+        "indexed_at "
         "FROM images ORDER BY id DESC LIMIT 60").fetchall()
     cur = rows[0] if rows else None
-    stats = {
-        "frames": CON.execute("SELECT COUNT(*) FROM images").fetchone()[0],
-        "seen": store.meta_get(CON, "frames_seen"),
-    }
+    stats = store.stats(CON, ROOT)
     return render_template(
         "index.html", rows=rows, cur=cur, stats=stats,
         similar=similar_pairs()[:18], pairs=len(similar_pairs()),
+        cur_pal=json.loads(cur[7]) if cur and cur[7] else [],
         observer=OBSERVER, uptime=fmt_uptime(), version=VERSION)
 
 

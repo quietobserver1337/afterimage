@@ -18,3 +18,5 @@ don't have a folder of images handy. index + thumbnails live under
 the web view, roughly:
 
 ![afterimage ui](docs/sample-profile.png)
+
+layout: `imaging.py` (load/hash/thumbs), `index.py` (sqlite), `web.py` (flask ui)
