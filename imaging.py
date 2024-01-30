@@ -17,7 +17,7 @@ def load(path):
 
 
 def ahash(im, size=8):
-    g = im.convert("L").resize((size, size), Image.ANTIALIAS)
+    g = im.convert("L").resize((size, size), Image.LANCZOS)
     px = list(g.getdata())
     avg = sum(px) / len(px)
     bits = 0
@@ -28,7 +28,7 @@ def ahash(im, size=8):
 
 
 def dhash(im, size=8):
-    g = im.convert("L").resize((size + 1, size), Image.ANTIALIAS)
+    g = im.convert("L").resize((size + 1, size), Image.LANCZOS)
     px = list(g.getdata())
     bits, i = 0, 0
     for y in range(size):
@@ -45,12 +45,12 @@ def hamming(a, b):
 
 def thumb(im, size=192):
     t = im.copy()
-    t.thumbnail((size, size), Image.ANTIALIAS)
+    t.thumbnail((size, size), Image.LANCZOS)
     return t
 
 
 def palette(im, n=5):
-    q = im.resize((64, 64)).quantize(colors=n, method=Image.MEDIANCUT)
+    q = im.resize((64, 64)).quantize(colors=n, method=Image.Quantize.MEDIANCUT)
     pal = q.getpalette()[: n * 3]
     return ["#%02x%02x%02x" % tuple(pal[i:i + 3])
             for i in range(0, len(pal), 3)]
