@@ -53,12 +53,14 @@
     <div class="card" id="meta">
       <h3>metadata</h3>
       {% if cur %}
-      <div class="kv"><span>id</span><b>{{ cur[0] }}</b></div>
+      <div class="kv"><span>frame</span><b>{{ cur[0] }}</b></div>
       <div class="kv"><span>file</span><b>{{ cur[1] }}</b></div>
       <div class="kv"><span>size</span><b>{{ cur[2] }}&times;{{ cur[3] }}</b></div>
       <div class="kv"><span>bytes</span><b>{{ cur[4] }}</b></div>
       <div class="kv"><span>ahash</span><b class="mono">{{ "%x"|format(cur[5]) }}</b></div>
       <div class="kv"><span>dhash</span><b class="mono">{{ "%x"|format(cur[6]) }}</b></div>
+      <div class="kv"><span>palette</span><b><span class="sws">{% for c in cur_pal %}<i style="background:{{ c }}"></i>{% endfor %}</span></b></div>
+      <div class="kv"><span>indexed</span><b class="dim">{{ cur_when }}</b></div>
       {% else %}
       <div class="dim small">empty library</div>
       {% endif %}
@@ -66,7 +68,7 @@
   </aside>
 </div>
 <footer>
-  <span>afterimage v{{ version }}</span>
+  <span>afterimage v{{ version }} &middot; indexing idle &middot; {{ stats.db }}</span>
   <span>frame {{ stats.seen }}</span>
 </footer>
 </body>
