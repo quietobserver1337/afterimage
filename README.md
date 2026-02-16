@@ -1,22 +1,23 @@
 # afterimage
 
-scan a folder of images into a local index, report near-duplicates.
+a small local visual index. scans a folder of images, computes
+perceptual hashes (aHash/dHash), finds near-duplicates and similar
+frames, and shows it all in a dark local dashboard.
 
-    python3 afterimage.py scan <dir>
-    python3 afterimage.py dupes <dir> 5
+![sample card](docs/sample-profile.png)
 
-there's a read-only web view now:
+## run
 
-    python3 web.py <dir>          # http://127.0.0.1:8777
+    pip install -r requirements.txt
+    python3 tools/make_samples.py 1400     # optional synthetic corpus
+    python3 web.py --root samples          # http://127.0.0.1:8777
 
-`tools/make_samples.py` writes a synthetic corpus to `samples/` if you
-don't have a folder of images handy. index + thumbnails live under
-`<dir>/.afterimage/`.
+## cli
 
-## ui
+    python3 afterimage.py scan --root samples
+    python3 afterimage.py dupes --root samples --thresh 5
+    python3 afterimage.py similar 12 --root samples
+    python3 afterimage.py stats --root samples
 
-the web view, roughly:
-
-![afterimage ui](docs/sample-profile.png)
-
-layout: `imaging.py` (load/hash/thumbs), `index.py` (sqlite), `web.py` (flask ui)
+index + thumbnails live under `<root>/.afterimage/`.
+needs python >= 3.10 for `int.bit_count`.

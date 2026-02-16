@@ -40,7 +40,7 @@ def dhash(im, size=8):
 
 
 def hamming(a, b):
-    return bin(a ^ b).count("1")
+    return (a ^ b).bit_count()
 
 
 def thumb(im, size=192):
