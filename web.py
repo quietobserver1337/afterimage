@@ -10,7 +10,7 @@ from flask import Flask, abort, render_template, send_file
 
 import index as store
 
-VERSION = "0.4.2"
+VERSION = "0.4.3"
 OBSERVER = os.environ.get("AFTERIMAGE_OBSERVER", "quietobserver")
 
 app = Flask(__name__)
