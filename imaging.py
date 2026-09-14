@@ -5,6 +5,9 @@ from PIL import Image
 
 EXTS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tif", ".tiff"}
 
+# sqlite integers are signed 64-bit; keep hashes under that ceiling
+HASH_MASK = (1 << 63) - 1
+
 
 def iter_images(root):
     for p in sorted(Path(root).rglob("*")):
@@ -24,7 +27,7 @@ def ahash(im, size=8):
     for i, v in enumerate(px):
         if v >= avg:
             bits |= 1 << i
-    return bits
+    return bits & HASH_MASK
 
 
 def dhash(im, size=8):
@@ -36,7 +39,7 @@ def dhash(im, size=8):
             if px[y * (size + 1) + x] > px[y * (size + 1) + x + 1]:
                 bits |= 1 << i
             i += 1
-    return bits
+    return bits & HASH_MASK
 
 
 def hamming(a, b):
