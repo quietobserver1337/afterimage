@@ -21,7 +21,7 @@ def open_db(root):
     d = Path(root) / DB_DIR
     d.mkdir(exist_ok=True)
     thumbs_dir(root).mkdir(exist_ok=True)
-    con = sqlite3.connect(db_path(root))
+    con = sqlite3.connect(db_path(root), check_same_thread=False)
     con.execute("""CREATE TABLE IF NOT EXISTS images(
         id INTEGER PRIMARY KEY,
         path TEXT UNIQUE,
